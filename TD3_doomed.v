@@ -1,6 +1,7 @@
 Check f_equal.
 Require Import List.
 Axiom TODO : forall x:Type, x.
+Axiom ltle : forall (x y : nat), x < y -> x <= y.
 
 Hypothesis le_lt_dec : forall (n m :nat), {n <=m} + {m < n}.
 
@@ -41,18 +42,22 @@ Proof.
 intros a l Hyp. inversion Hyp. apply SortedNil. exact H1.
 Qed.
 
-Lemma or_eq : forall (n m : nat), n < m -> n <= m.
-Proof.
-Admitted.
-
 Lemma SortedFirst : forall (l : list nat) (a b : nat), Sorted (a :: b :: l) -> a <= b.
 Proof.
-Admitted.
+intros a b l Hyp. inversion Hyp. exact H3. 
+Qed.
 
 Lemma InsertNew: forall (l : list nat) (a b: nat), 
 exists (q : list nat) (h : nat), (inser a (b::l)) = h::q /\ (h=a \/ h=b).
 Proof.
-Admitted.
+intros l a b. simpl. destruct (le_lt_dec a b).
+  + exists (b::l). exists a. split.
+    -- reflexivity.
+    -- left. reflexivity.
+  + exists (inser a l). exists b. split.
+    -- reflexivity.
+    -- right. reflexivity.
+Qed.
 
 Lemma inser_is_ok : forall (l:list nat) (n:nat), Sorted(l)-> Sorted(inser n l).
 Proof.
@@ -61,16 +66,25 @@ intros l n l_sorted. induction l.
   + simpl. destruct (le_lt_dec n a) as [le | lt].
     - apply SortedCons. exact l_sorted. exact le.
     - apply sorted_subpart in l_sorted as lbis_sorted. 
-      apply IHl in lbis_sorted as r_sorted. destruct l. apply or_eq in lt as lt_larg. 
+      apply IHl in lbis_sorted as r_sorted. destruct l. apply ltle in lt as lt_larg. 
       ++ simpl. apply ((SortedCons a n nil) (SortedSingle n) (lt_larg)).
       ++ apply (SortedFirst l a n0) in l_sorted as a_leq_n0.
          assert (exists (q : list nat) (h : nat), (inser n (n0::l)) = h::q /\ (h=n \/ h=n0)).
         -- apply (InsertNew l n n0).
-             -- destruct H as [l1]. destruct H as [n1].
-                destruct H as [relat H].
-
+        -- destruct H as [l1]. destruct H as [n1]. 
+           destruct H as [relat H].
+           rewrite -> relat.
+                apply (SortedCons a n1 l1).
+                 +++ rewrite <- relat. exact r_sorted.
+                 +++ destruct H as [case1 | case2].
+                     --- rewrite case1. exact (ltle a n lt).
+                     --- rewrite case2. exact a_leq_n0.
+Qed.
 
 Goal forall (l:list nat), Sorted(sort l).
 Proof.
-Admitted.
+intro l. induction l.
+  + simpl. apply SortedNil.
+  + simpl. apply (inser_is_ok (sort l) a IHl).
+Qed.
 
