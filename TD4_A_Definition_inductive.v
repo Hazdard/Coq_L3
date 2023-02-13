@@ -197,7 +197,9 @@ Qed.
 Lemma mult_plus_distr_l_bis : forall n m p,
   n*(m+p)=n*m+n*p.
 Proof.
-Admitted.
+intros n m p.
+rewrite mult_comm. rewrite mult_plus_distr_r. rewrite mult_comm. rewrite mult_comm with (n:=p) (m:=n). reflexivity.
+Qed. 
 
 (** ** Exercice 2 - L'appartenance à une liste *)
 
