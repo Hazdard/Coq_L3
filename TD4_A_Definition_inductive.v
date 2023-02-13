@@ -188,7 +188,9 @@ Lemma mult_plus_distr_l : forall n m p,
 Proof.
 intros n m p. induction n.
   + simpl. reflexivity.
-  + 
+  + simpl. rewrite IHn. rewrite  plus_assoc. symmetry. rewrite plus_assoc. rewrite plus_comm with (n:=m+n*m) (m:=p).
+    rewrite plus_assoc. rewrite plus_comm with (n:=p) (m:=m). reflexivity.
+Qed.
  
 (** Prouver en utilisant les lemmes précédents, mais bien sûr pas    
    [mult_plus_distr_l]) *)
