@@ -84,7 +84,7 @@ Proof.
   reflexivity.
 Qed.
 
-Goal forall x y : nat, S x + y = S (x+y).
+Lemma succ_simpl : forall x y : nat, S x + y = S (x+y).
 Proof.
   intros. reflexivity.
 Qed.
@@ -103,11 +103,15 @@ Qed.
 (** Prouver les lemmes suivants sur l'addition des entiers naturels : *)
 Lemma plus_0_n : forall n, 0 + n = n.
 Proof.
-Admitted.
+intro n. simpl. reflexivity.
+Qed.
 
 Lemma plus_n_0 : forall n, n + 0 = n.
 Proof.
-Admitted.
+intro n. induction n.
+  + reflexivity.
+  + simpl. rewrite IHn. reflexivity.
+Qed.
 
 (** Ecrire la multiplication pour les entiers *)
 
@@ -115,40 +119,61 @@ Admitted.
 
 Lemma mult_0_n : forall n : nat, 0 * n = 0.
 Proof.
-Admitted.
+intro n. simpl. reflexivity.
+Qed.
 
 Lemma mult_n_0 : forall n, n * 0 = 0.
 Proof.
-Admitted.
-
+intro n. induction n.
+  + reflexivity.
+  + simpl. exact IHn.
+Qed.
 
 Lemma plus_assoc : forall n m p,
   n+(m+p) = n+m+p.
 Proof.
-Admitted.
+intros n m p. induction n.
+  + simpl. reflexivity.
+  + simpl. rewrite IHn. reflexivity.
+Qed.
 
 Lemma plus_n_Sm : forall n m,
   n + S m = S (n + m).
 Proof.
-Admitted.
+intros n m. induction n.
+  + simpl. reflexivity.
+  + simpl. rewrite IHn. reflexivity.
+Qed.
 
 Lemma plus_comm : forall n m, n + m = m + n.
 Proof.
-Admitted.
+intros n m. induction n.
+  + simpl. rewrite plus_n_0. reflexivity.
+  + simpl. rewrite plus_n_Sm. rewrite IHn. reflexivity.
+Qed.
 
 Lemma mult_n_Sm : forall n m, n*S m = n + n*m.
 Proof.
-Admitted.  
+intros n m. induction n.
+  + simpl. reflexivity.
+  + simpl. rewrite IHn. rewrite plus_assoc. rewrite plus_assoc. rewrite plus_comm with (n:=m) (m:=n). reflexivity.
+Qed.
 
 Lemma mult_comm : forall n m, n *m=m*n.
 Proof.
-Admitted.
-
+intros n m. induction n.
+  + simpl. rewrite mult_n_0. reflexivity.
+  + simpl. rewrite mult_n_Sm. rewrite IHn. reflexivity.
+Qed.
 
 Lemma mult_plus_distr_r : forall n m p,
   (n+m)*p = n*p+m*p.
 Proof.
-Admitted.
+intros n m p. induction p.
+  + rewrite mult_n_0. rewrite mult_n_0. rewrite mult_n_0. simpl. reflexivity.
+  + rewrite mult_n_Sm. rewrite mult_n_Sm. rewrite mult_n_Sm. rewrite IHp. rewrite plus_assoc. 
+    symmetry. rewrite plus_assoc. rewrite plus_comm with (n:=n+n*p) (m:=m). rewrite plus_assoc. rewrite plus_comm with (n:=m) (m:=n). reflexivity.
+Qed.
 
 Lemma mult_assoc : forall n m p, n*(m*p) = (n*m)*p.
 Proof.
@@ -326,82 +351,4 @@ Admitted.
 
 (** [x <= y] est une notation pour [le x y],
     où [le] est défini de manière inductive comme le montre la 
-    requête suivante. *)
-
-Print le.
-
-(** Les constructeurs [le_n] et [le_S] qui définissent [le] peuvent être
-    être utilisés comme hypothèses / lemmes, par exemple dans la tactique
-    [apply]. *)
-
-Goal le 2 3.
-Proof.
-  apply le_S. apply le_n.
-Qed.
-
-(** Si [x <= y] est vrai, il doit avoir été obtenu par l'un des deux 
-    constructeurs : la règle d'analyse de cas correspondante est donnée
-    par la tactique [inversion]. *)
-
-Goal forall x y : nat, x <= y -> x = y \/ x <= pred y.
-Proof.
-  intros x y H. inversion H.
-  + left. reflexivity.
-  + right.
-    (* L'étape suivante est facultative,
-       elle vous aide à voir ce qui est identique pour Coq :
-       [simpl] calcule ce qui peut être calculé. *)
-    simpl. exact H0.
-Qed.
-
-Theorem le_O : forall x:nat, O <= x.
-Proof.
-Admitted.
-
-Theorem le_S_S : forall x:nat, forall y:nat,
-  S x <= S y -> x <= y.
-Proof.
-Admitted.
-
-(** [x<y] est une notation pour [lt x y] qui est elle-même définie
-    en termes de [le]. *)
-
-Print lt.
-
-Theorem le_lt : forall x:nat, forall y:nat, x < S y -> x <= y.
-Proof.
-Admitted.
-
-Theorem lt_S_case : forall x:nat, forall y:nat,
-  x < S y -> x = y \/ x < y.
-Proof.
-Admitted.
-
-(** ** Exercice 7 - Une induction forte *)
-
-(** Avec les ingrédients ci-dessus, vous devriez être capable de prouver
-    un principe d'induction forte, exprimé en utilisant une quantification
-    sur des prédicats de nombres naturels. *)
-
-Theorem strong_induction :
-  forall (P:nat->Prop),
-  (forall x:nat, (forall y:nat, y < x -> P y) -> P x) ->
-  (forall x:nat, P x).
-Proof.
-Admitted.
-
-(** ** Exercice 8 - Raisonnement sur les multiples *)
-
-(** Un dernier exercice pour ce tutoriel ! *)
-
-Inductive multiple : nat -> nat -> Prop :=
-  | multiple_O : forall n:nat, multiple n O
-  | multiple_step :
-      forall n:nat, forall m:nat, multiple n m -> multiple n (n+m).
-
-Goal forall x:nat,
-  multiple 2 x -> multiple 3 x -> multiple 6 x.
-Proof.
-Admitted.
-
-(** Merci à David Baelde et Catherine Dubois. *)
+    requête sui
