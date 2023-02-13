@@ -177,13 +177,18 @@ Qed.
 
 Lemma mult_assoc : forall n m p, n*(m*p) = (n*m)*p.
 Proof.
-Admitted.
+intros n m p. induction n.
+  + simpl. reflexivity.
+  + simpl. rewrite IHn. rewrite mult_plus_distr_r. reflexivity.
+Qed.
 
 (** Prouver directement par induction sur n *)
 Lemma mult_plus_distr_l : forall n m p,
   n*(m+p)=n*m+n*p.
 Proof.
-Admitted.
+intros n m p. induction n.
+  + simpl. reflexivity.
+  + 
  
 (** Prouver en utilisant les lemmes précédents, mais bien sûr pas    
    [mult_plus_distr_l]) *)
