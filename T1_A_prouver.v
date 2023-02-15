@@ -163,14 +163,19 @@ intros H Hn. destruct H. unfold not in H. unfold not in H0. destruct Hn.
   +apply H0. exact H1.
 Qed.
 
-Goal ~(P \/ Q) -> (~P /\ ~Q).
+Lemma not_or : forall (P Q : Prop), ~(P \/ Q) -> (~P /\ ~Q).
 Proof.
-  intros H.
+  intros P Q H. split.
+    + unfold not in H. intro Hn. destruct H. left. exact Hn.
+    + unfold not in H. intro Hn. destruct H. right. exact Hn.
 Qed.
 
 Goal (~P \/ ~Q) -> ~(P /\ Q).
 Proof.
-Admitted.
+intros H Hn. destruct H.
+  + unfold not in H. destruct Hn. apply H. exact H0.
+  + unfold not in H. destruct Hn. apply H. exact H1.
+Qed.
 
 (** *** Exercice 4 - Avec le modus ponens *)
 
@@ -180,22 +185,29 @@ Admitted.
 
 Lemma modus_ponens : forall P Q : Prop, P -> (P -> Q) -> Q.
 Proof.
-Admitted.
+intros P Q H0 H1. apply H1. exact H0.
+Qed.
+
 
 (** Démontrer à nouveau l'énoncé suivant, mais cette fois en utilisant
     [modus_ponens]. *)
 Lemma impl_not : forall P : Prop, P -> ~ ~ P.
 Proof.
-Admitted.
+intro P. unfold not. apply modus_ponens.
+Qed.
 
 (** Démontrer l'énoncé suivant à partir de [impl_not]. *)
 Lemma P_notP_contradiction : forall P : Prop, ~ (P /\ ~ P).
 Proof.
-Admitted.
+intro P. unfold not. intro Hn. destruct Hn. apply H0. exact H.
+Qed.
 
 Lemma not_and : forall P Q : Prop, P \/ Q -> ~(~ P /\ ~Q).
 Proof.
-Admitted.
+intros P Q. intro H. unfold not. intro Hn. destruct Hn. destruct H.
+  + apply H0. exact H.
+  + apply H1. exact H.
+Qed.
 
 (** ** VIII.  Raisonnement classique
 
@@ -215,15 +227,22 @@ Axiom RAA : forall A:Prop, ~~A -> A.
 
 Goal ~(P /\ Q) -> (~P \/ ~Q).
 Proof.
-Admitted.
+intro H. apply RAA. intro Hn. apply not_or in Hn. destruct Hn. apply RAA in H0. apply RAA in H1. 
+apply H. split. exact H0. exact H1.
+Qed.
 
 (** [LEM] pour Law of Excluded Middle. *)
 Lemma LEM : P \/ ~P.
 Proof.
-Admitted.
+apply RAA. intro H. apply not_or in H. apply H. destruct H. exact H.
+Qed.
+
 
 Goal (P -> Q) \/ (Q -> P).
 Proof.
-Admitted.
+apply RAA. intro H. apply not_or in H. destruct H. 
+apply H. intro P. apply RAA. intro nQ. 
+apply H0. intro Q. apply RAA. intro nP. apply nP. exact P.
+Qed.
 
 (** Merci à David Baelde et Catherine Dubois. *)
