@@ -199,7 +199,7 @@ Lemma mult_plus_distr_l_bis : forall n m p,
 Proof.
 intros n m p.
 rewrite mult_comm. rewrite mult_plus_distr_r. rewrite mult_comm. rewrite mult_comm with (n:=p) (m:=n). reflexivity.
-Qed. 
+Qed.
 
 (** ** Exercice 2 - L'appartenance à une liste *)
 

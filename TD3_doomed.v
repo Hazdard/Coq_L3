@@ -1,8 +1,6 @@
-Check f_equal.
 Require Import List.
-Axiom TODO : forall x:Type, x.
-Axiom ltle : forall (x y : nat), x < y -> x <= y.
 
+Axiom ltle : forall (x y : nat), x < y -> x <= y.
 Hypothesis le_lt_dec : forall (n m :nat), {n <=m} + {m < n}.
 
 Fixpoint inser (a:nat) (l:list nat) : list nat := 
@@ -19,18 +17,7 @@ Fixpoint sort (l:list nat) : list nat := match l with
   | nil => nil
 end.
 
-Fixpoint ins_ind (i:nat) (a:nat) (l:list nat) : list nat := match i with
-  |0 => a::l
-  |S j => match l with
-                    |nil => a::nil
-                    |a::r => a::(ins_ind j a r)
-          end
-end.
-
-Inductive permuted : (list nat) -> (list nat) -> Type := 
-  |N : permuted nil nil
-  |Succ : forall (x i:nat) (l1 l2 :list nat), (permuted l1 l2) -> 
-permuted (x::l1) (ins_ind i x l2).
+(** Preuve que le tri renvoie une liste triée **)
 
 Inductive Sorted : list nat -> Prop :=
   | SortedNil : Sorted nil
@@ -88,3 +75,21 @@ intro l. induction l.
   + simpl. apply (inser_is_ok (sort l) a IHl).
 Qed.
 
+(** Preuve que le tri renvoie une permutation de la liste initiale **)
+
+Fixpoint ins_ind (i:nat) (a:nat) (l:list nat) : list nat := match i with
+  |0 => a::l
+  |S j => match l with
+                    |nil => a::nil
+                    |a::r => a::(ins_ind j a r)
+          end
+end.
+
+Inductive permuted : (list nat) -> (list nat) -> Type := 
+  |N : permuted nil nil
+  |Succ : forall (x i:nat) (l1 l2 :list nat), (permuted l1 l2) -> 
+permuted (x::l1) (ins_ind i x l2).
+
+Goal forall (l:list nat), permuted l (sort l).
+Proof.
+Admitted.
