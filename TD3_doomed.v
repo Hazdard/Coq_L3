@@ -103,7 +103,7 @@ Goal forall (l:list nat), permuted l (sort l).
 Proof.
 intro l. induction l as [|m l'].
   + simpl. apply N.
-  + simpl. assert (exists (i:nat), (inser m l')=(ins_ind i m l')).
+  + simpl. assert (exists (i:nat), (inser m l')=(ins_ind i m l')) as Hyp.
     -- apply ins_equiv.
     -- destruct H.
 

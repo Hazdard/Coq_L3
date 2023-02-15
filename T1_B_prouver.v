@@ -37,7 +37,8 @@ Qed.
 Lemma exists_not_forall : forall P : nat -> Prop,
 (exists n, P n) ->  ~(forall n,~ (P n)).
 Proof.
-Admitted.
+intros P H. unfold not. intro Hn. destruct H. apply Hn with (n:=x). exact H.
+Qed.
 
 (** Note : Ici aussi, l'ordre supérieur a été utilisé. *)
 
@@ -52,8 +53,8 @@ Variable a : T.
 
 Goal ((exists x:T, P x) \/ Q) -> (exists x:T, P x \/ Q).
 Proof.
-Admitted.
-
+intros H. destruct H. destruct H. exists x. left. exact H. exists a. right. exact H.
+Qed.
 
 (** ** II. Egalité *)
 
