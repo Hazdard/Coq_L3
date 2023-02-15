@@ -101,13 +101,11 @@ Qed.
 
 Goal forall (l:list nat), permuted l (sort l).
 Proof.
-intro l. induction l as [|a l'].
+intro l. induction l as [|m l'].
   + simpl. apply N.
-  + simpl. assert (exists (i:nat), (inser a l')=(ins_ind i a l')).
+  + simpl. assert (exists (i:nat), (inser m l')=(ins_ind i m l')).
     -- apply ins_equiv.
-    -- apply H !!!!!!!!!!!!!!!
-
-
+    -- destruct H.
 
 
 
