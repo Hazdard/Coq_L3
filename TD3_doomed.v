@@ -81,7 +81,7 @@ Fixpoint ins_ind (i:nat) (a:nat) (l:list nat) : list nat := match i with
   |0 => a::l
   |S j => match l with
                     |nil => a::nil
-                    |a::r => a::(ins_ind j a r)
+                    |b::r => b::(ins_ind j a r)
           end
 end.
 
@@ -92,7 +92,12 @@ permuted (x::l1) (ins_ind i x l2).
 
 Lemma ins_equiv : forall (l : list nat) (a:nat), exists (i:nat), (inser a l)=(ins_ind i a l).
 Proof.
-Admitted.
+intros l a. induction l as [|m l'].
+  + exists 0. simpl. reflexivity.
+  + simpl. destruct (le_lt_dec a m).
+    -- exists 0. simpl. reflexivity.
+    -- destruct IHl' as [i0]. rewrite H. exists (S i0). simpl. reflexivity.
+Qed.
 
 Goal forall (l:list nat), permuted l (sort l).
 Proof.
@@ -100,7 +105,7 @@ intro l. induction l as [|a l'].
   + simpl. apply N.
   + simpl. assert (exists (i:nat), (inser a l')=(ins_ind i a l')).
     -- apply ins_equiv.
-    -- apply H.
+    -- apply H !!!!!!!!!!!!!!!
 
 
 
