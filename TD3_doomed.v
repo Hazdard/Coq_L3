@@ -60,7 +60,7 @@ intros l n l_sorted. induction l.
         -- apply (InsertNew l n n0).
         -- destruct H as [l1]. destruct H as [n1]. 
            destruct H as [relat H].
-           rewrite -> relat.
+           rewrite relat.
                 apply (SortedCons a n1 l1).
                  +++ rewrite <- relat. exact r_sorted.
                  +++ destruct H as [case1 | case2].
@@ -87,9 +87,51 @@ end.
 
 Inductive permuted : (list nat) -> (list nat) -> Type := 
   |N : permuted nil nil
-  |Succ : forall (x i:nat) (l1 l2 :list nat), (permuted l1 l2) -> 
+  |Succ : forall (x : nat) (l1 l2 :list nat), (permuted l1 l2) -> forall (i : nat),
 permuted (x::l1) (ins_ind i x l2).
+
+Lemma ins_equiv : forall (l : list nat) (a:nat), exists (i:nat), (inser a l)=(ins_ind i a l).
+Proof.
+Admitted.
 
 Goal forall (l:list nat), permuted l (sort l).
 Proof.
-Admitted.
+intro l. induction l as [|a l'].
+  + simpl. apply N.
+  + simpl. assert (exists (i:nat), (inser a l')=(ins_ind i a l')).
+    -- apply ins_equiv.
+    -- apply H.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
