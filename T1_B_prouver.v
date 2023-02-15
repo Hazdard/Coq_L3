@@ -69,7 +69,7 @@ Qed.
 
 Variable f : T -> T.
 
-Goal forall x y : T, x = y -> f x = f y.
+Lemma eq_arg : forall x y : T, x = y -> f x = f y.
 Proof.
   intros x y Heq.
   rewrite Heq.
@@ -99,11 +99,13 @@ Qed.
 
 Lemma symmetry : forall x y : T, x = y -> y = x.
 Proof.
-Admitted.
+intros x y Eq. rewrite <- Eq. reflexivity.
+Qed.
 
 Lemma transitivity : forall x y z : T, x = y -> y = z -> x = z.
 Proof.
-Admitted.
+intros x y z Eq1 Eq2. rewrite <- Eq1 in Eq2. exact Eq2.
+Qed.
 
 (** A présent, vous avez le droit d'utiliser la tactique [symmetry]
     pour échanger les 2 membres d'une égalité. *)
@@ -130,7 +132,10 @@ Module Functions.
 
   Theorem inv_bij : forall (f:A->A), involutive f -> bijective f.
   Proof.
-  Admitted.
+  intros f HypInv. split.
+  + intros x y HypEq. destruct (HypInv x). destruct (HypInv y). rewrite HypEq. reflexivity.
+  + intro x. exists (f x). rewrite HypInv. reflexivity.
+Qed.
 
 End Functions.
 
@@ -162,7 +167,8 @@ Module Drinker.
 
   Goal exists x:Person, Drinks x -> forall y:Person, Drinks y.
   Proof.
-  Admitted.
+    apply RAA. unfold not. intro H.
+
 
 End Drinker.
 
