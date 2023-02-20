@@ -33,7 +33,8 @@ Proof.
   + induction n.
     ++ (* pose proof (IHm 1) as toto. *)
 assert (exists r1, ack m 1 r1) by (apply (IHm 1)). destruct H as [r1]. exists r1. apply ack_m_0. exact H.
-    ++ 
+    ++ destruct IHn as [rn]. pose proof (IHm rn). destruct H0 as [rn']. exists rn'. apply (ack_m_n m n rn rn' H H0).
+Qed.
 (** Demandez à Coq d'extraire un programme de la preuve [ack_total].
     Le résultat est décevant : c'est parce que le contenu calculatoire des 
     objets de [Prop] est effacé. *)
