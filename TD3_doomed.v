@@ -105,7 +105,7 @@ intro l. induction l as [|m l'].
   + simpl. apply N.
   + simpl. assert (exists (i:nat), (inser m l')=(ins_ind i m l')) as Hyp.
     -- apply ins_equiv.
-    -- destruct H.
+    -- destruct Hyp as [i0].
 
 
 
