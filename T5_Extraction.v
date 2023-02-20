@@ -31,7 +31,9 @@ Proof.
   induction m.
   + intro n. exists (S n). apply (ack_0_n n).
   + induction n.
-    ++ eexists. apply ack_m_0. apply IHm with (n:=1).
+    ++ (* pose proof (IHm 1) as toto. *)
+assert (exists r1, ack m 1 r1) by (apply (IHm 1)). destruct H as [r1]. exists r1. apply ack_m_0. exact H.
+    ++ 
 (** Demandez à Coq d'extraire un programme de la preuve [ack_total].
     Le résultat est décevant : c'est parce que le contenu calculatoire des 
     objets de [Prop] est effacé. *)
