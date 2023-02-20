@@ -74,7 +74,12 @@ Proof.
       À la fin, utilisez [Defined] plutôt que [Qed] pour éviter les 
       avertissements : ceci informe Coq que nous nous intéressons au contenu 
       de la preuve, et pas seulement au fait que l'énoncé est prouvable. *)
-Admitted.
+  induction m.
+  + intro n. exists (S n). apply (ack_0_n n).
+  + induction n.
+    ++ pose proof (IHm 1). destruct H as [r1]. exists r1. apply ack_m_0. exact a.
+    ++ destruct IHn as [rn]. pose proof (IHm rn). destruct H as [rn']. exists rn'. apply (ack_m_n m n rn rn' a a0).
+Qed.
 
 (** Nous pouvons maintenant extraire quelque chose d'intéressant de la preuve
     de la totalité. *)
@@ -110,7 +115,7 @@ Fixpoint addition (m:nat) (n:nat) : nat :=
     le résultat de la fonction d'Ackermann pour [S m] et [n]. *)
 
 Fixpoint fack' (fack_m : nat -> nat) (n:nat) : nat := match n with
-  | O => 12 (* TODO *)
+  | O => fack_m 1
   | S n' => 3456 (* TODO *)
 end.
 
