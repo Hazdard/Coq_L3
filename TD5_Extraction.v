@@ -116,12 +116,18 @@ Fixpoint addition (m:nat) (n:nat) : nat :=
 
 Fixpoint fack' (fack_m : nat -> nat) (n:nat) : nat := match n with
   | O => fack_m 1
-  | S n' => 3456 (* TODO *)
+  | S n' => fack_m (fack' fack_m n')
 end.
 
 (** Définissez maintenant [fack] comme étant la fonction d'Ackermann. *)
 
-Fixpoint fack (m:nat) (n:nat) : nat.
+Fixpoint fack (m:nat) (n:nat) : nat := match m with
+  | 0 => (S n)
+  | S m' => match n with 
+          | 0 => (fack m' 1)
+          | S n' => (fack m' (fack (S m') n'))
+        end
+end.
 
 (** Prouvez que [fack] implémente la spécification d'Ackermann. *)
 
