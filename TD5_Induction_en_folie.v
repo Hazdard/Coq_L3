@@ -66,7 +66,9 @@ Notation "m < n" := (lt m n).
     A vous de jouer ! *)
 Lemma le_trans : forall m n o, m <= n -> n <= o -> m <= o.
 Proof.
-Admitted.
+intros m n o. intros H1 H2. inversion H2.
+  + rewrite <- H0. exact H1.
+  + 
 
 Theorem O_le_n : forall n,
   0 <= n.
