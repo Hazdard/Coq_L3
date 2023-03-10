@@ -2,6 +2,8 @@ Require Import List.
 
 Require Import Bool.
 
+Require Import Lia.
+
 Variable T : Type.
 
 Hypothesis T_eq_dec : forall (x y :T), {x=y} + {~x=y}.
@@ -150,7 +152,8 @@ Qed.
 
 Lemma WfSub : forall a ms, wf(a::ms)-> wf ms.
 Proof.
-Admitted.
+intros a ms. intro Hform. inversion Hform. destruct H0. exact H0.
+Qed.
 
 Goal forall x s, wf s -> (member x s = true <-> InMultiset x s).
 intros x s. intro Hform. split.
@@ -159,7 +162,19 @@ intros x s. intro Hform. split.
     ++ pose proof (WfSub a s Hform) as Hform2. destruct a as [a1 n]. destruct (T_eq_dec a1 x). 
       +++ destruct n. inversion Hform. rewrite e. apply (HD x n s).
       +++ apply IHs in Hform2. apply (TL (a1,n) x s Hform2). inversion Hmem. destruct (T_eq_dec a1 x). contradiction. reflexivity.
-  +
+  + intro Hyp. induction Hyp.
+    ++ pose proof (WfSub h ms Hform) as Hform2. apply IHHyp in Hform2. destruct h as [a n]. simpl. destruct (T_eq_dec a x). reflexivity. exact Hform2.
+    ++ simpl. destruct (T_eq_dec x x). reflexivity. contradiction.
+Qed.
+
+
+Goal forall x n s, n>0 -> InMultiset x (add x n s).
+intros x n s Hstr. destruct n. lia. induction s.
+  + simpl. apply (HD x n empty).
+  + destruct a as [a1 m]. simpl. destruct (T_eq_dec a1 x).
+    ++ rewrite e. apply (HD x (n+m) s).
+    ++ apply (TL (a1,m) x (add x (S n) s)). exact IHs.
+Qed.
 
 
 
