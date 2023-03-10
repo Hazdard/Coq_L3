@@ -110,7 +110,9 @@ destruct n.
     ++ intro H. apply (Cons x n nil). split. exact H. intro Hneg. inversion Hneg.
     ++ intro H. simpl. destruct hd as [a m]. destruct (T_eq_dec a x).
         +++ apply (Cons a (n+m) tl). inversion H. destruct H1. split. exact H1. exact H4.
-        +++ destruct m. inversion H. apply (Cons a m (add x (S n) tl)). inversion H. destruct H1. split. apply IHtl in H1. exact H1. 
+        +++ destruct m. inversion H. apply (Cons a m (add x (S n) tl)). inversion H. destruct H1. split.
+            ++++ apply IHtl in H1. exact H1.
+            ++++ intro Hneg. destruct Hneg.
 
 
 
