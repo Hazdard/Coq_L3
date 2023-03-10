@@ -103,6 +103,13 @@ induction ms as [|hd tl].
     ++ rewrite IHtl. reflexivity.
 Qed.
 
+Lemma AddDistinct : forall (a x : T) (n : nat) (ms : multiset), ~(InMultiset a ms) -> ~(a=x) -> ~(InMultiset a (add x (S n) ms)).
+Proof.
+intros a x n ms. intros Happ Hdist. induction ms.
+  + simpl. intro Hneg. inversion Hneg. inversion H1. contradiction.
+  + intro Hneg. Admitted.
+
+
 Goal forall x n ms, wf ms -> wf (add x n ms).
 destruct n.
   +intros ms H. rewrite (Add0 x ms). exact H.
@@ -112,7 +119,48 @@ destruct n.
         +++ apply (Cons a (n+m) tl). inversion H. destruct H1. split. exact H1. exact H4.
         +++ destruct m. inversion H. apply (Cons a m (add x (S n) tl)). inversion H. destruct H1. split.
             ++++ apply IHtl in H1. exact H1.
-            ++++ intro Hneg. destruct Hneg.
+            ++++ intro Hneg. destruct Hneg. Admitted.
+
+
+
+
+
+(** Question 3 **)
+
+Goal forall x, ~InMultiset x empty.
+Proof.
+intro x. intro Hneg. inversion Hneg.
+Qed.
+
+Goal forall x y, InMultiset y (singleton x) -> x=y.
+Proof.
+intros x y. intro Hyp. inversion Hyp. inversion H1. reflexivity.
+Qed.
+
+Goal forall x y, x=y -> InMultiset y (singleton x).
+Proof.
+intros x y. intro Hyp. rewrite Hyp. apply (HD y 0 empty).
+Qed.
+
+Goal forall x, multiplicity x (singleton x) = 1.
+Proof.
+intro x. simpl. destruct (T_eq_dec x x). reflexivity. contradiction.
+Qed.
+
+
+Lemma WfSub : forall a ms, wf(a::ms)-> wf ms.
+Proof.
+Admitted.
+
+Goal forall x s, wf s -> (member x s = true <-> InMultiset x s).
+intros x s. intro Hform. split.
+  + intro Hmem. induction s.
+    ++ inversion Hmem.
+    ++ pose proof (WfSub a s Hform) as Hform2. destruct a as [a1 n]. destruct (T_eq_dec a1 x). 
+      +++ destruct n. inversion Hform. rewrite e. apply (HD x n s).
+      +++ apply IHs in Hform2. apply (TL (a1,n) x s Hform2). inversion Hmem. destruct (T_eq_dec a1 x). contradiction. reflexivity.
+  +
+
 
 
 
