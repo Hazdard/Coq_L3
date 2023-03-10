@@ -176,16 +176,26 @@ intros x n s Hstr. destruct n. lia. induction s.
     ++ apply (TL (a1,m) x (add x (S n) s)). exact IHs.
 Qed.
 
+Lemma CoqEstPerdu : forall (a : T) (k : nat) (h : T*nat) (ms tl : multiset), h::ms = (a,k)::tl -> tl=ms.
+Proof.
+intros a k h ms tl. Admitted.
+
+
+Goal forall x y n s, x<>y ->(InMultiset y (add x n s) <-> InMultiset y s).
+Proof.
+intros x y n s. intro Hdiff. split.
+  + intro Happ. induction s as [|hd tl].
+    ++ destruct n. 
+      +++ inversion Happ.
+      +++ inversion Happ. inversion H1. admit. (** on a x<>y et x=y mais Coq ne voit pas la contradiction ... **)
+   ++ destruct hd as [a m]. destruct (T_eq_dec a x).
+      +++ rewrite e. apply (TL (x,m) y tl). rewrite -> e in Happ. inversion Happ. destruct (T_eq_dec x x). pose proof (CoqEstPerdu x (n+m) h ms tl H). rewrite <- H2 in H1. exact H1. contradiction. 
 
 
 
 
 
-
-
-
-
-
+inversion Happ. destruct (T_eq_dec a x). apply (TL (a,m) y tl). pose proof (CoqEstPerdu a (n+m) h ms tl H). rewrite H2. exact H1.
 
 
 
