@@ -2,6 +2,8 @@
 
 Require Export ZArith.
 
+Require Import Lia.
+
 (** Ce tutoriel regroupe différentes notions avancées autour de 
     l'induction. *)
 
@@ -70,8 +72,7 @@ intros m n o. intros H1 H2. inversion H2.
   + rewrite <- H0. exact H1.
   + 
 
-Theorem O_le_n : forall n,
-  0 <= n.
+Theorem O_le_n : forall n, 0 <= n.
 Proof.
 Admitted.
 
