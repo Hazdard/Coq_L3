@@ -99,13 +99,13 @@ intros l a. induction l as [|m l'].
     -- destruct IHl' as [i0]. rewrite H. exists (S i0). simpl. reflexivity.
 Qed.
 
+
 Goal forall (l:list nat), permuted l (sort l).
 Proof.
 intro l. induction l as [|m l'].
   + simpl. apply N.
-  + simpl. assert (exists (i:nat), (inser m l')=(ins_ind i m l')) as Hyp.
-    -- apply ins_equiv.
-    -- destruct Hyp as [i0].
+  + simpl. assert( { i | inser m (sort l') = ins_ind i m (sort l') }) as Hyp. admit.
+    destruct Hyp as [i0]. rewrite e. apply (Succ m l' (sort l') IHl' i0).
 
 
 
