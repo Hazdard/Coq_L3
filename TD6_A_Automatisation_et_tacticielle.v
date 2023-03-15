@@ -198,7 +198,7 @@ Module T2_B_exists.
   intros H y.
   destruct H.
   eexists.
-  instantiate (1 := x). apply (H y). (* ou [apply H] *)
+  instantiate (1 := x). eapply (H y). (* ou [apply H] *)
   Qed.
 
   (** La tactique [instantiate] peut être pratique pour faire de l'exploration
@@ -213,9 +213,9 @@ Module T2_B_exists.
   Goal (exists x:T, P x \/ Q) -> ((exists x:T, P x) \/ Q).
   Proof.
     intro H. destruct H. destruct H.
-     + left.  eexists. admit. (* TODO *)
+     + left.  eexists. eapply H.
      + right. exact H.
-  Admitted.
+Qed.
 
   Variable a : T.
 
@@ -223,15 +223,15 @@ Module T2_B_exists.
   Proof.
   intro Hor.
   destruct Hor as [Hex | HQ].
-   + destruct Hex. eexists. admit. (* TODO *)
-   + eexists. admit. (* TODO *)
-  Admitted.
+   + destruct Hex. eexists. left. instantiate (1 := x). apply H.
+   + exists a. right. exact HQ. 
+Qed.
 
   (* Finissez cette preuve à l'aide de la tactique [instantiate]. *)
   Goal exists p : nat * nat, fst p = 3.
   Proof.
-  econstructor. (* ou [eexists] *) admit.
-  Admitted.
+  eexists. instantiate (1 := (3,42)). simpl. reflexivity.
+Qed.
 
 End T2_B_exists.
 
