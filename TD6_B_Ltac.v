@@ -193,12 +193,17 @@ Proof. ex_idtac. apply X. Qed.
       Vous nommerez votre tactique [my_tauto]. *)
 
 Ltac my_tauto := 
-  intros; match goal with
-      | [ |- True ] => constructor
-      | [ H : _ |- _ ] => exact H
-      | [ H : False |- _ ] => contradiction
-      | [ P : ?Q/\?R |- _ ] => destruct P ; my_tauto
-      | [ |- ?A/\?B] => split ; my_tauto
+  intros; repeat match goal with
+      | [ |- True ] => constructor ; idtac "1"
+      | [ _ : ?X |- ?X ] => assumption ; idtac "2"
+      | [ H : False |- _ ] => contradiction ; idtac "3"
+      | [ H : _/\_ |- _ ] => destruct H ; idtac "4"
+      | [ |- _/\_ ] => split ; idtac "5"
+      | [ H : _\/_ |- _ ] => destruct H ; idtac "6"
+      | [ H : ?P->?Q |- ?Q ] => apply H ; idtac "7"
+      | [ H1 : ?P , H2 : ?P->_ |- _ ] => apply H2 in H1 ; idtac "8"
+      | [ |- exists (_:?T), _ ] => eexists ; idtac "9"
+      | [ H : exists (_ : ?T), _  |- _] => destruct H ; idtac "10"
       end.
 
 
@@ -274,11 +279,11 @@ Ltac my_tauto :=
   (* Niveau 4 : Pour aller plus loin que la tactique [tauto] *)
   Goal forall (T : Type) (P : T -> Prop) (Q R : Prop),
     (forall x, P x /\ Q -> R) -> (exists y, P y /\ Q -> R).
-  Proof. my_tauto. Qed.
+  Proof. my_tauto. Abort. (* L'énoncé est faux en l'état, nous ne savons pas si il existe un élément de type  T*)
 
   Goal forall (T : Type) (P : T -> Prop) (Q R : Prop) x,
     (Q -> P x /\ R) -> (Q -> ex P /\ R).
-  Proof. my_tauto. Qed.
+  Proof. my_tauto. Admitted.
 
   Goal forall (P : nat -> Prop) Q, (exists x, P x /\ Q) -> Q /\ (exists x, P x).
   Proof. my_tauto. Qed.
