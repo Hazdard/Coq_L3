@@ -115,7 +115,7 @@ End Ltac_example.
   Goal forall (a b : bool),
     (if a then 42 else 42) = (if b then 42 else 42).
   Proof.
-    intros.
+    intros. 
     repeat find_if. (* Rien ne se passe. *)
   Abort.
 
@@ -192,7 +192,15 @@ Proof. ex_idtac. apply X. Qed.
       une version la plus proche possible de la tactique [tauto].
       Vous nommerez votre tactique [my_tauto]. *)
 
-  Ltac my_tauto := admit.
+Ltac my_tauto := 
+  intros; match goal with
+      | [ |- True ] => constructor
+      | [ H : _ |- _ ] => exact H
+      | [ H : False |- _ ] => contradiction
+      | [ P : ?Q/\?R |- _ ] => destruct P ; my_tauto
+      | [ |- ?A/\?B] => split ; my_tauto
+      end.
+
 
   (** Voici quelques cas de tests pour vous aider à tester votre tactique : *)
 

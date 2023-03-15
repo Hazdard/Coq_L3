@@ -224,8 +224,8 @@ Qed.
   intro Hor.
   destruct Hor as [Hex | HQ].
    + destruct Hex. eexists. left. instantiate (1 := x). apply H.
-   + eexists. right. exact HQ.
-Admitted.
+   + exists a. right. exact HQ. 
+Qed.
 
   (* Finissez cette preuve à l'aide de la tactique [instantiate]. *)
   Goal exists p : nat * nat, fst p = 3.
