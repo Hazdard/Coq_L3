@@ -201,9 +201,9 @@ Ltac my_tauto :=
       | [ |- _/\_ ] => split ; idtac "5"
       | [ H : _\/_ |- _ ] => destruct H ; idtac "6"
       | [ H : ?P->?Q |- ?Q ] => apply H ; idtac "7"
-      | [ H1 : ?P , H2 : ?P->_ |- _ ] => apply H2 in H1 ; idtac "8"
-      | [ |- exists (_:?T), _ ] => eexists ; idtac "9"
-      | [ H : exists (_ : ?T), _  |- _] => destruct H ; idtac "10"
+      | [ H2 : _->_ |- _ ] => destruct H2 ; idtac H2 ; idtac "8"
+      | [ x : _ |- ex _ ] => exists x ; idtac "9"
+      | [ H : exists _,_  |- _] => destruct H ; idtac H ; idtac "10"
       end.
 
 
@@ -283,7 +283,7 @@ Ltac my_tauto :=
 
   Goal forall (T : Type) (P : T -> Prop) (Q R : Prop) x,
     (Q -> P x /\ R) -> (Q -> ex P /\ R).
-  Proof. my_tauto. Admitted.
+  Proof. my_tauto. Qed.
 
   Goal forall (P : nat -> Prop) Q, (exists x, P x /\ Q) -> Q /\ (exists x, P x).
   Proof. my_tauto. Qed.
@@ -323,6 +323,10 @@ Ltac my_tauto :=
       de prouver le but [lt_impl_le_prop], mais pas le but [lt_impl_le_bool]. *)
   Lemma lt_impl_le_prop : forall n m, n < m -> n <= m.
   Proof. intros. lia. Qed.
+
+Ltac conv_bool_to_prop := repeat match goal with
+  | [  |- _ ] => intros
+end.
 
   Lemma lt_impl_le_bool : forall n m, (n <? m) = true -> (n <=? m) = true.
   Proof. intros. (* lia. *) Abort.
