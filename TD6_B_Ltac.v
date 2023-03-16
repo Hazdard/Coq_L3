@@ -309,15 +309,24 @@ Ltac my_tauto :=
 
   (** Il est tout à fait possible de passer d'une notation à l'autre : *)
   Lemma le_bool_imp_le : forall n m, (n <=? m) = true -> (n <= m).
-  Proof.
-  induction n.
-   + destruct m.
+  Proof. 
+    induction n.
+    + destruct m.
       { intros. constructor.                     }
       { intros. constructor. apply Peano.le_0_n. }
-   + destruct m.
+    + destruct m.
       { simpl. intro H. discriminate H.                                 }
       { simpl. intro H. apply IHn in H. apply Peano.le_n_S. assumption. }
   Qed.
+
+Lemma le_imp_le_bool : forall n m, (n <= m) -> (n <=? m)=true.
+Proof.
+  induction n.
+  + intros. simpl. reflexivity.
+  + intros. simpl. destruct m. inversion H. inversion H. 
+    ++ pose proof (IHn m). rewrite H1 in H0. apply H0. constructor.
+    ++ apply Peano.le_S_n in H. apply (IHn m). exact H.
+Qed.
 
   (** Mais comme [lia] ne raisonne que sur [Prop], cette tactique est capable
       de prouver le but [lt_impl_le_prop], mais pas le but [lt_impl_le_bool]. *)
@@ -325,11 +334,15 @@ Ltac my_tauto :=
   Proof. intros. lia. Qed.
 
 Ltac conv_bool_to_prop := repeat match goal with
-  | [  |- _ ] => intros
+  | [ H : _ <? _ = true|- _ ] => apply le_bool_imp_le in H ; idtac "1"
+  | [ H : _ <=? _ = true|- _ ] => apply le_bool_imp_le in H ; idtac "1.2"
+  | [ |-  _ <? _ = true ] => apply le_imp_le_bool ; idtac "2"
+  | [ |-  _ <=? _ = true ] => apply le_imp_le_bool ; idtac "2.2"
+
 end.
 
   Lemma lt_impl_le_bool : forall n m, (n <? m) = true -> (n <=? m) = true.
-  Proof. intros. (* lia. *) Abort.
+  Proof. intros. conv_bool_to_prop. lia. Qed.
 
 
   (** Votre objectif est donc d'écrire une tactique qui réécrit des notations
