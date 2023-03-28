@@ -1,5 +1,7 @@
 Require Import ZArith.
 
+(** Exercice 1 **)
+
 Inductive earith :=
   | Const : Z -> earith
   | Var : nat -> earith
@@ -20,3 +22,21 @@ Proof.
 intros. rewrite H in H0. exact H0.
 Qed.
 
+(** Exercice 2 **)
+
+Inductive e_bool :=
+  | Constb : Z -> e_bool
+  | Varb : nat -> e_bool
+  | Eqb : e_bool -> e_bool -> e_bool
+  | Notb : e_bool -> e_bool
+  | Andb : e_bool -> e_bool -> e_bool.
+
+Search (Z -> Z -> bool).
+
+Fixpoint interp_ebool (e : e_bool) (vars : nat -> Z) : Z := match e with
+  | Constb n => n
+  | Varb n => vars n
+  | Eqb e1 e2 => if Z.eqb (interp_ebool e1 vars) (interp_ebool e2 vars) then (interp_ebool e1 vars) else 0
+  | Notb e => if Z.eqb (interp_ebool e vars) 0 then 0 else (interp_ebool e vars)
+  | Andb e1 e2 => if Z.eqb (interp_ebool e1 vars) 0 then 0 else (interp_ebool e2 vars)
+end.
