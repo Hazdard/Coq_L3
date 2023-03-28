@@ -53,19 +53,23 @@ Inductive IMP :=
   | Affect : nat -> earith -> IMP
   | Cons : IMP -> IMP -> IMP
   | IfThenElse : e_bool -> IMP -> IMP -> IMP
-  | While : e_bool -> IMP -> IMP.
+  | While : e_bool -> IMP -> IMP
+  | Until : e_bool -> IMP -> IMP
+  | DoubleAffect : nat -> nat -> earith -> earith -> IMP.
 
 Fixpoint interp_imp (e : IMP) (vars : nat -> Z) (i : nat): (nat -> Z) := 
   match i with 
     | 0=> vars
     | S l => match e with
                   | Skip => vars
-                  | Affect n e => fun (k : nat) => if n=?k then (interp_earith e vars) else (vars k)
+                  | Affect n e => fun (k : nat) => if k=?n then (interp_earith e vars) else (vars k)
                   | Cons e1 e2 => interp_imp e2 (interp_imp e1 vars l) l
                   | IfThenElse bl e1 e2 => if Z.eqb (interp_ebool bl vars) 0 then (interp_imp e2 vars l) else (interp_imp e1 vars l)
                   | While bl e1 => if Z.eqb (interp_ebool bl vars) 0 then vars else (interp_imp (While bl e1) (interp_imp e1 vars l) l)
-                                    end
-                end.
+                  | Until bl e1 => if Z.eqb (interp_ebool bl vars) 0 then (interp_imp (While bl e1) (interp_imp e1 vars l) l) else vars
+                  | DoubleAffect n1 n2 e1 e2 => fun (k : nat) => if k=?n1 then (interp_earith e1 vars) else (if k=?n2 then (interp_earith e2 vars) else (vars k))
+                end
+end.
 
 Lemma determin_imp : forall (e:IMP) (vars : nat -> Z) (i : nat) (a b : nat -> Z), (interp_imp e vars i) = a -> (interp_imp e vars i) = b -> a=b.
 Proof.
@@ -83,6 +87,7 @@ unfold equivalent_com. eexists. intros. unfold interp_imp. induction (interp_ebo
     + simpl. reflexivity.
     + simpl. reflexivity.
 Qed.
+
 
 
 
