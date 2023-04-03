@@ -67,7 +67,7 @@ Fixpoint interp_imp (e : IMP) (vars : nat -> Z) (i : nat): (nat -> Z) :=
                   | IfThenElse bl e1 e2 => if Z.eqb (interp_ebool bl vars) 0 then (interp_imp e2 vars l) else (interp_imp e1 vars l)
                   | While bl e1 => if Z.eqb (interp_ebool bl vars) 0 then vars else (interp_imp (While bl e1) (interp_imp e1 vars l) l)
                   | Until bl e1 => if Z.eqb (interp_ebool bl vars) 0 then (interp_imp (While bl e1) (interp_imp e1 vars l) l) else vars
-                  | DoubleAffect n1 n2 e1 e2 => fun (k : nat) => if k=?n1 then (interp_earith e1 vars) else (if k=?n2 then (interp_earith e2 vars) else (vars k))
+                  | DoubleAffect n1 n2 e1 e2 => fun (k : nat) => if k=?n2 then (interp_earith e2 vars) else (if k=?n1 then (interp_earith e1 vars) else (vars k))
                 end
 end.
 
@@ -88,17 +88,17 @@ unfold equivalent_com. eexists. intros. unfold interp_imp. induction (interp_ebo
     + simpl. reflexivity.
 Qed.
 
-Goal forall (x y :nat) (e1 e2 : earith), 
-(forall (vars : nat-> Z) (i : nat), (interp_imp (Affect y e2) vars (S i))= (interp_imp (Affect y e2) (fun (k : nat) => if k=?x then (interp_earith e1 vars) else(vars k) )  )) 
--> (equivalent_com (DoubleAffect x y e1 e2) (Cons (Affect x e1) (Affect y e2))).
+Axiom fun_eq : forall (f g : nat -> Z), (forall x : nat, f x = g x) <-> f = g.
 
-
-
-(** Changer la valuation de x ne change pas l'interpretation de e2 **)
-
-
-
-
+Goal forall (x y :nat) (e1 e2 : earith),
+(forall (vars : nat-> Z), (interp_earith e2 vars) = (interp_earith e2 (fun k : nat => if k =? x then interp_earith e1 vars else vars k)))
+<->
+(equivalent_com (DoubleAffect x y e1 e2) (Cons (Affect x e1) (Affect y e2))).
+Proof. intros. split.
+    + exists 1. intros. apply (fun_eq (interp_imp (DoubleAffect x y e1 e2) vars 2) (interp_imp (Cons (Affect x e1) (Affect y e2)) vars 2)). intros. simpl. destruct (x0 =? y).
+      ++ apply (H vars).
+      ++ reflexivity.
+    + unfold equivalent_com. intros. destruct H as [i H']. pose proof (H' vars).
 
 
 
