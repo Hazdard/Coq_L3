@@ -88,7 +88,12 @@ unfold equivalent_com. eexists. intros. unfold interp_imp. induction (interp_ebo
     + simpl. reflexivity.
 Qed.
 
-Axiom fun_eq : forall (f g : nat -> Z), (forall x : nat, f x = g x) <-> f = g.
+Axiom fun_eq : forall (f g : nat -> Z), (forall x : nat, f x = g x) -> f = g.
+
+Lemma fun_eq_inv : forall (x :nat) (f g : nat -> Z), f = g -> f x = g x.
+Proof.
+intros. rewrite H. reflexivity.
+Qed.
 
 Goal forall (x y :nat) (e1 e2 : earith),
 (forall (vars : nat-> Z), (interp_earith e2 vars) = (interp_earith e2 (fun k : nat => if k =? x then interp_earith e1 vars else vars k)))
@@ -98,7 +103,8 @@ Proof. intros. split.
     + exists 1. intros. apply (fun_eq (interp_imp (DoubleAffect x y e1 e2) vars 2) (interp_imp (Cons (Affect x e1) (Affect y e2)) vars 2)). intros. simpl. destruct (x0 =? y).
       ++ apply (H vars).
       ++ reflexivity.
-    + unfold equivalent_com. intros. destruct H as [i H']. pose proof (H' vars).
+    + unfold equivalent_com. intros. destruct H as [i H']. pose proof (H' vars). apply (fun_eq_inv y) in H. repeat simpl in H. destruct (y =? y).
+      ++ unfold interp_imp in H.
 
 
 
