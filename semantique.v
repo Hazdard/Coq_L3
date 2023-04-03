@@ -88,6 +88,11 @@ unfold equivalent_com. eexists. intros. unfold interp_imp. induction (interp_ebo
     + simpl. reflexivity.
 Qed.
 
+Goal forall (x y :nat) (e1 e2 : earith), (equivalent_com (DoubleAffect x y e1 e2) (Cons (Affect x e1) (Affect y e2)))
+<->(forall (val : nat)
+
+
+(** Changer la valuation de x ne change pas l'interpretation de e2 **)
 
 
 
