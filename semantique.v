@@ -88,8 +88,10 @@ unfold equivalent_com. eexists. intros. unfold interp_imp. induction (interp_ebo
     + simpl. reflexivity.
 Qed.
 
-Goal forall (x y :nat) (e1 e2 : earith), (equivalent_com (DoubleAffect x y e1 e2) (Cons (Affect x e1) (Affect y e2)))
-<->(forall (val : nat)
+Goal forall (x y :nat) (e1 e2 : earith), 
+(forall (vars : nat-> Z) (i : nat), (interp_imp (Affect y e2) vars (S i))= (interp_imp (Affect y e2) (fun (k : nat) => if k=?x then (interp_earith e1 vars) else(vars k) )  )) 
+-> (equivalent_com (DoubleAffect x y e1 e2) (Cons (Affect x e1) (Affect y e2))).
+
 
 
 (** Changer la valuation de x ne change pas l'interpretation de e2 **)
