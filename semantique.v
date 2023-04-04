@@ -1,5 +1,7 @@
 Require Import ZArith.
 
+(* Search (Z -> Z -> bool). *)
+
 (** Exercice 1 **)
 
 Inductive earith :=
@@ -104,7 +106,8 @@ Proof. intros. split.
       ++ apply (H vars).
       ++ reflexivity.
     + unfold equivalent_com. intros. destruct H as [i H']. pose proof (H' vars). apply (fun_eq_inv y) in H. repeat simpl in H. destruct (y =? y).
-      ++ unfold interp_imp in H.
+      ++ unfold interp_imp in H. destruct i.
+        (* i=0 *) +++ pose proof (H' (fun (k:nat) => if k=?x then (Z.of_nat 1) else (if k=?y then (Z.of_nat 2) else (Z.of_nat 0)))). simpl in H0. pose proof (fun_eq H0 x).
 
 
 
