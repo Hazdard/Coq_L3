@@ -157,13 +157,36 @@ end.
 
   (** Question 3 **)
 
-  Theorem determin_imp : forall (e : IMP) (vars : env) (env1 env2 : env) (k : nat), sem_imp e vars env1 k -> sem_imp e vars env2 k -> env1 = env2.
+  Theorem determin_imp : forall (e : IMP) (vars : env) (env1 env2 : env) (k1 k2 : nat), sem_imp e vars env1 k1 -> sem_imp e vars env2 k2 -> env1 = env2.
   Proof.
-  induction e. intros.
-  + inversion H. inversion H0. subst. reflexivity.
+  induction e.
+  + intros. inversion H. inversion H0. subst. reflexivity.
   + intros. inversion H. inversion H0. subst. pose proof (determin_earith e vars n0 n1 H6 H12). rewrite H1. reflexivity.
-  + intros. inversion H. inversion H0. subst. pose proof (IHe1 vars vars2 vars4 0 H3 H10). rewrite H1 in H7. pose proof (IHe2 vars4 env1 env2 0 H7 H14). assumption.
-  +
+  + intros. inversion H. inversion H0. subst. pose proof (IHe1 vars vars2 vars4 0 0 H3 H10). rewrite H1 in H7. pose proof (IHe2 vars4 env1 env2 0 0 H7 H14). assumption.
+  + intros. inversion H ; inversion H0 ; subst.
+      ++ apply (IHe1 vars env1 env2 k1 k2 H9 H18).
+      ++ subst. pose proof (determin_e_bool e1 vars n 0 H4 H13). contradiction.
+      ++ pose proof (determin_e_bool e1 vars n0 0 H13 H4). contradiction.
+      ++ apply (IHe2 vars env1 env2 k1 k2 H9 H18).
+  + intros. inversion H ; inversion H0 ; subst. admit.
+  Admitted.
+
+
+  (** Question 4 **)
+
+  Definition equivalent_com e1 e2 := forall (vars env1 env2 : env) (n m : nat), (sem_imp e1 vars env1 n) -> (sem_imp e2 vars env2 m) -> (env1 = env2).
+
+  (** Question 5 **)
+
+  Goal forall (b : e_bool) (c : IMP), equivalent_com (While b c) (IfThenElse b (Cons c (While b c)) Skip).
+  Proof. unfold equivalent_com. intros. inversion H ; inversion H0 ; subst.
+      + inversion H18. subst. pose proof (determin_imp c vars vars2 vars0 k 0 H5 H6). rewrite H1 in H9. apply (determin_imp (While b c) vars0 env1 env2 p 0 H9 H11).
+      + pose proof (determin_e_bool b vars n0 0 H3 H13). contradiction.
+      + pose proof (determin_e_bool b env1 0 n1 H3 H11). symmetry in H1. contradiction.
+      + inversion H16. reflexivity.
+Qed.
+
+
 
 
 
