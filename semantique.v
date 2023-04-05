@@ -162,6 +162,7 @@ end.
   induction e. intros.
   + inversion H. inversion H0. subst. reflexivity.
   + intros. inversion H. inversion H0. subst. pose proof (determin_earith e vars n0 n1 H6 H12). rewrite H1. reflexivity.
+  + intros. inversion H. inversion H0. subst. pose proof (IHe1 vars vars2 vars4 0 H3 H10). rewrite H1 in H7. pose proof (IHe2 vars4 env1 env2 0 H7 H14). assumption.
   +
 
 
