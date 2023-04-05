@@ -39,7 +39,7 @@ end.
 
   (** Question 3 **)
 
-  Lemma determin_earith : forall (e:earith) (vars : env) (a b : Z), sem_earith e vars a -> sem_earith e vars b -> a=b.
+  Theorem determin_earith : forall (e:earith) (vars : env) (a b : Z), sem_earith e vars a -> sem_earith e vars b -> a=b.
   Proof.
   induction e.
     + intros. inversion H. inversion H0. subst. reflexivity.
@@ -123,19 +123,19 @@ Definition update_env (vars : env) (x : nat) (n : Z) : env := match vars with
   |Env env1 => Env (fun (k:nat) => if k=?x then n else (env1 k))
 end.
 
-  Inductive sem_imp : IMP -> env -> env -> Prop :=
-    | SemSkip : forall (vars : env), sem_imp Skip vars vars
-    | SemAffect : forall (x : nat) (e : earith) (n : Z) (vars : env), sem_earith e vars n -> sem_imp (Affect x e) vars (update_env vars x n)
-    | SemCons : forall (vars1 vars2 vars3 : env) (e1 e2 : IMP), sem_imp e1 vars1 vars2 -> sem_imp e2 vars2 vars3 -> sem_imp (Cons e1 e2) vars1 vars3
-    | SemIfThen : forall (vars1 vars2 : env) (e1 e2 : IMP) (b : e_bool) (n : Z), sem_e_bool b vars1 n -> n <> 0%Z -> sem_imp e1 vars1 vars2 -> sem_imp (IfThenElse b e1 e2) vars1 vars2
-    | SemifElse : forall (vars1 vars2 : env) (e1 e2 : IMP) (b : e_bool) (n : Z), sem_e_bool b vars1 n -> n = 0%Z -> sem_imp e2 vars1 vars2 -> sem_imp (IfThenElse b e1 e2) vars1 vars2
-    | SemWhileIn : forall (vars1 vars2 : env) (e : IMP) (b : e_bool) (n : Z), sem_e_bool b vars1 n -> n <> 0%Z -> sem_imp e vars1 vars2 -> sem_imp (While b e) vars1 vars2
-    | SemWhileOut : forall (vars1 vars2 : env) (e : IMP) (b : e_bool) (n : Z), sem_e_bool b vars1 n -> n = 0%Z -> sem_imp (While b e) vars1 vars1
+  Inductive sem_imp : IMP -> env -> env -> nat -> Prop :=
+    | SemSkip : forall (vars : env), sem_imp Skip vars vars 0
+    | SemAffect : forall (x : nat) (e : earith) (n : Z) (vars : env), sem_earith e vars n -> sem_imp (Affect x e) vars (update_env vars x n) 0
+    | SemCons : forall (vars1 vars2 vars3 : env) (e1 e2 : IMP), sem_imp e1 vars1 vars2 0 -> sem_imp e2 vars2 vars3 0 -> sem_imp (Cons e1 e2) vars1 vars3 0
+    | SemIfThen : forall (vars1 vars2 : env) (e1 e2 : IMP) (b : e_bool) (n : Z) (k : nat), sem_e_bool b vars1 n -> n <> 0%Z -> sem_imp e1 vars1 vars2 k -> sem_imp (IfThenElse b e1 e2) vars1 vars2 k
+    | SemifElse : forall (vars1 vars2 : env) (e1 e2 : IMP) (b : e_bool) (n : Z) (k : nat), sem_e_bool b vars1 n -> n = 0%Z -> sem_imp e2 vars1 vars2 k -> sem_imp (IfThenElse b e1 e2) vars1 vars2 k
+    | SemWhileIn : forall (vars1 vars2 vars3 : env) (e : IMP) (b : e_bool) (n : Z) (k p : nat), sem_e_bool b vars1 n -> n <> 0%Z -> sem_imp e vars1 vars2 k -> sem_imp (While b e) vars2 vars3 p -> sem_imp (While b e) vars1 vars3 (S p)
+    | SemWhileOut : forall (vars1 vars2 : env) (e : IMP) (b : e_bool) (n : Z) (k : nat), sem_e_bool b vars1 n -> n = 0%Z -> sem_imp (While b e) vars1 vars1 0
    (** Question 6 **)
-   | SemUntilIn : forall (vars1 vars2 : env) (e : IMP) (b : e_bool) (n : Z), sem_e_bool b vars1 n -> n = 0%Z -> sem_imp e vars1 vars2 -> sem_imp (Until b e) vars1 vars2
-    | SemUntilOut : forall (vars1 vars2 : env) (e: IMP) (b : e_bool) (n : Z), sem_e_bool b vars1 n -> n <> 0%Z -> sem_imp (Until b e) vars1 vars1
+    | SemUntilIn : forall (vars1 vars2 vars3 : env) (e : IMP) (b : e_bool) (n : Z) (k p : nat), sem_e_bool b vars1 n -> n = 0%Z -> sem_imp e vars1 vars2 k -> sem_imp (Until b e) vars2 vars3 p -> sem_imp (Until b e) vars1 vars3 (S p)
+    | SemUntilOut : forall (vars1 vars2 : env) (e: IMP) (b : e_bool) (n : Z), sem_e_bool b vars1 n -> n <> 0%Z -> sem_imp (Until b e) vars1 vars1 0
     (** Question 7 **)
-    | SemDoubleAffect : forall (x y : nat) (e1 e2 : earith) (n1 n2 : Z) (vars : env), sem_earith e1 vars n1 -> sem_earith e2 vars n2  -> sem_imp (DoubleAffect x y e1 e2) vars (update_env (update_env vars x n1) y n2).
+    | SemDoubleAffect : forall (x y : nat) (e1 e2 : earith) (n1 n2 : Z) (vars : env), sem_earith e1 vars n1 -> sem_earith e2 vars n2  -> sem_imp (DoubleAffect x y e1 e2) vars (update_env (update_env vars x n1) y n2) 0.
 
   (** Question 2 **)
 
@@ -154,3 +154,26 @@ end.
                                 end
                   end
 end.
+
+  (** Question 3 **)
+
+  Theorem determin_imp : forall (e : IMP) (vars : env) (env1 env2 : env) (k : nat), sem_imp e vars env1 k -> sem_imp e vars env2 k -> env1 = env2.
+  Proof.
+  induction e. intros.
+  + inversion H. inversion H0. subst. reflexivity.
+  + intros. inversion H. inversion H0. subst. pose proof (determin_earith e vars n0 n1 H6 H12). rewrite H1. reflexivity.
+  +
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
