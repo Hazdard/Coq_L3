@@ -116,7 +116,8 @@ Qed.
     | IfThenElse : e_bool -> IMP -> IMP -> IMP
     | While : e_bool -> IMP -> IMP
     | Until : e_bool -> IMP -> IMP
-    | DoubleAffect : nat -> nat -> earith -> earith -> IMP.
+    | DoubleAffect : nat -> nat -> earith -> earith -> IMP
+    | Let : nat -> earith -> IMP -> IMP.
 
 Definition update_env (vars : env) (x : nat) (n : Z) : env := match vars with
   |Bot => Bot 
@@ -135,7 +136,9 @@ end.
     | SemUntilIn : forall (vars1 vars2 vars3 : env) (e : IMP) (b : e_bool) (n : Z) (k p : nat), sem_e_bool b vars1 n -> n = 0%Z -> sem_imp e vars1 vars2 k -> sem_imp (Until b e) vars2 vars3 p -> sem_imp (Until b e) vars1 vars3 (S p)
     | SemUntilOut : forall (vars1 vars2 : env) (e: IMP) (b : e_bool) (n : Z), sem_e_bool b vars1 n -> n <> 0%Z -> sem_imp (Until b e) vars1 vars1 0
     (** Question 7 **)
-    | SemDoubleAffect : forall (x y : nat) (e1 e2 : earith) (n1 n2 : Z) (vars : env), sem_earith e1 vars n1 -> sem_earith e2 vars n2  -> sem_imp (DoubleAffect x y e1 e2) vars (update_env (update_env vars x n1) y n2) 0.
+    | SemDoubleAffect : forall (x y : nat) (e1 e2 : earith) (n1 n2 : Z) (vars : env), sem_earith e1 vars n1 -> sem_earith e2 vars n2  -> sem_imp (DoubleAffect x y e1 e2) vars (update_env (update_env vars x n1) y n2) 0
+    (** Question 9 **)
+    | SemLet : forall (x : nat) (a1 : earith) (a2 : IMP) (n1 n2 : Z) (vars vars2: env) (k : nat), sem_earith a1 vars n1 -> sem_imp a2 (update_env vars x n1) vars2 k -> sem_imp (Let x a1 a2) vars (update_env vars2 x n1) 0.
 
   (** Question 2 **)
 
@@ -149,13 +152,14 @@ end.
                                       | Cons e1 e2 => interp_imp e2 (interp_imp e1 vars l) l
                                       | IfThenElse bl e1 e2 => if Z.eqb (interp_e_bool bl vars) 0 then (interp_imp e2 vars l) else (interp_imp e1 vars l)
                                       | While bl e1 => if Z.eqb (interp_e_bool bl vars) 0 then vars else (interp_imp (While bl e1) (interp_imp e1 vars l) l)
-                                      | Until bl e1 => if Z.eqb (interp_e_bool bl vars) 0 then (interp_imp (While bl e1) (interp_imp e1 vars l) l) else vars
-                                      | DoubleAffect x y e1 e2 => (update_env (update_env vars x (interp_earith e1 vars)) y (interp_earith e2 vars))
+                 (** Question 6 **)   | Until bl e1 => if Z.eqb (interp_e_bool bl vars) 0 then (interp_imp (While bl e1) (interp_imp e1 vars l) l) else vars
+                 (** Question 7 **)   | DoubleAffect x y e1 e2 => (update_env (update_env vars x (interp_earith e1 vars)) y (interp_earith e2 vars))
+                 (** Question 9 **)   | Let x a1 a2 => update_env (interp_imp a2 (update_env vars x (interp_earith a1 vars)) l) x (env1 x)
                                 end
                   end
 end.
 
-  (** Question 3 **)
+  (** Question 3 (tenant compte de 6,7 et 9) **)
 
   Theorem determin_imp : forall (e : IMP) (k1 k2 : nat) (vars : env) (env1 env2 : env), sem_imp e vars env1 k1 -> sem_imp e vars env2 k2 -> env1 = env2.
   Proof.
@@ -179,6 +183,7 @@ end.
       ++ inversion H. inversion H0. subst. pose proof (determin_e_bool e env2 n0 0 H12 H5). contradiction.
       ++ pose proof (IHe k k0 vars vars2 vars4 H8 H17). subst. apply (IHk1 k2 vars4 env1 env2 H9 H18).
  + intros. inversion H. inversion H0. subst. (pose proof determin_earith e vars n1 n3 H8 H17). (pose proof determin_earith e0 vars n2 n4 H9 H18). rewrite H1. rewrite H2. reflexivity.
+ + intros. inversion H. inversion H0. subst. pose proof (determin_earith e vars n1 n0 H7 H15). rewrite H1. rewrite H1 in H8. pose proof (IHe k k0 (update_env vars n n0) vars2 vars3 H8 H16). rewrite H2. reflexivity.
 Qed.
 
 
@@ -187,7 +192,7 @@ Qed.
   Definition equivalent_com e1 e2 := forall (vars env1 env2 : env) (n m : nat), (sem_imp e1 vars env1 n) -> (sem_imp e2 vars env2 m) -> (env1 = env2).
 
   (** Question 5 **)
-  
+
   Goal forall (b : e_bool) (c : IMP), equivalent_com (While b c) (IfThenElse b (Cons c (While b c)) Skip).
   Proof. unfold equivalent_com. intros. inversion H ; inversion H0 ; subst.
       + inversion H18. subst. pose proof (determin_imp c k 0 vars vars2 vars0 H5 H6). rewrite H1 in H9. apply (determin_imp (While b c) p 0 vars0 env1 env2 H9 H11).
