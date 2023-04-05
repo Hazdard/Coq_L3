@@ -177,14 +177,14 @@ end.
       ++ inversion H. inversion H0. subst. pose proof (determin_e_bool e env1 0 n0 H3 H10). symmetry in H1. contradiction.
       ++ inversion H. inversion H0. subst. pose proof (determin_e_bool e env2 n 0 H4 H12). contradiction.
       ++ pose proof (IHe k k0 vars vars2 vars4 H8 H17). subst. apply (IHk1 k2 vars4 env1 env2 H9 H18).
- + induction k1 ; induction k2 ; intros ; inversion H ; inversion H0 ; subst.
+  + induction k1 ; induction k2 ; intros ; inversion H ; inversion H0 ; subst.
       ++ reflexivity.
       ++ inversion H. inversion H0. subst. pose proof (determin_e_bool e env1 0 n0 H13 H4). symmetry in H1. contradiction.
       ++ inversion H. inversion H0. subst. pose proof (determin_e_bool e env2 n0 0 H12 H5). contradiction.
       ++ pose proof (IHe k k0 vars vars2 vars4 H8 H17). subst. apply (IHk1 k2 vars4 env1 env2 H9 H18).
- + intros. inversion H. inversion H0. subst. (pose proof determin_earith e vars n1 n3 H8 H17). (pose proof determin_earith e0 vars n2 n4 H9 H18). rewrite H1. rewrite H2. reflexivity.
- + intros. inversion H. inversion H0. subst. pose proof (determin_earith e vars n1 n0 H7 H15). rewrite H1. rewrite H1 in H8. pose proof (IHe k k0 (update_env vars n n0) vars2 vars3 H8 H16). rewrite H2. reflexivity.
-Qed.
+  + intros. inversion H. inversion H0. subst. (pose proof determin_earith e vars n1 n3 H8 H17). (pose proof determin_earith e0 vars n2 n4 H9 H18). rewrite H1. rewrite H2. reflexivity.
+  + intros. inversion H. inversion H0. subst. pose proof (determin_earith e vars n1 n0 H7 H15). rewrite H1. rewrite H1 in H8. pose proof (IHe k k0 (update_env vars n n0) vars2 vars3 H8 H16). rewrite H2. reflexivity.
+  Qed.
 
 
   (** Question 4 **)
@@ -202,17 +202,13 @@ Qed.
 Qed.
 
 
+(** Exercice 4 **)
 
+  (** Question 1 **)
 
-
-
-
-
-
-
-
-
-
-
-
-  
+  Inductive ML :=
+    | ConstML : Z -> ML
+    | VarML : nat -> ML
+    | PlusML : ML -> ML -> ML
+    | LambdaML : nat -> ML -> ML
+    | AppML : ML -> ML -> ML.
